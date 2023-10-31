@@ -1,0 +1,33 @@
+/------------------------------- นับจำนวนรถบันทึกลง excel ---------------------------------
+import datetime
+from openpyxl import load_workbook, Workbook
+
+try:
+    xl = load_workbook('C:\\Excel\\data.xlsx')
+    sheet = xl.active
+except FileNotFoundError:
+    xl = Workbook()
+    sheet = xl.active
+    sheet['A1'] = "ประเภท"
+    sheet['B1'] = "จำนวน"
+    sheet['C1'] = "วันที่และเวลา"
+
+objects = payload["DeepDetect"]["obj_count"]
+dd = datetime.datetime.now()
+
+# ค้นหาแถวสุดท้ายที่มีข้อมูล
+last_row = sheet.max_row
+
+for objs in objects:
+    if objs["name"] == "car":
+        car_count = objs["count"]
+        print(objs["name"], car_count, dd)
+        
+        # เพิ่มข้อมูลลงใน Excel
+        sheet.cell(row=last_row + 1, column=1, value="car")
+        sheet.cell(row=last_row + 1, column=2, value=car_count)
+        sheet.cell(row=last_row + 1, column=3, value=dd.strftime("%Y-%m-%d %H:%M:%S"))
+        last_row += 1
+
+# บันทึกไฟล์ Excel ใหม่
+xl.save('C:\\Excel\\data.xlsx')
